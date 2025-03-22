@@ -299,3 +299,85 @@ def playGame(wordList):
 if __name__ == '__main__':
     wordList = loadWords()
     playGame(wordList)
+
+class Hand(object):
+    VOWELS = 'aeiou'
+    CONSONANTS = 'bcdfghjklmnpqrstvwxyz'
+
+    def __init__(self, n):
+        """
+        Initialize a Hand.
+
+        n: integer, the size of the hand.
+        """
+        assert type(n) == int, "Hand size must be an integer."
+        self.HAND_SIZE = n
+        self.hand = {}
+        self.dealNewHand()
+
+    def dealNewHand(self):
+        """
+        Deals a new hand, and sets the hand attribute to the new hand.
+        """
+        self.hand = {}
+        numVowels = self.HAND_SIZE // 3
+
+        for i in range(numVowels):
+            x = Hand.VOWELS[random.randrange(0, len(Hand.VOWELS))]
+            self.hand[x] = self.hand.get(x, 0) + 1
+
+        for i in range(numVowels, self.HAND_SIZE):
+            x = Hand.CONSONANTS[random.randrange(0, len(Hand.CONSONANTS))]
+            self.hand[x] = self.hand.get(x, 0) + 1
+
+    def setDummyHand(self, handString):
+        """
+        Allows you to set a dummy hand. Useful for testing your implementation.
+
+        handString: A string of letters you wish to be in the hand. Length of this
+        string must be equal to self.HAND_SIZE.
+
+        This method converts sets the hand attribute to a dictionary containing
+        the letters of handString.
+        """
+        assert len(handString) == self.HAND_SIZE, "Length of handString must equal HAND_SIZE."
+        self.hand = {}
+        for char in handString:
+            self.hand[char] = self.hand.get(char, 0) + 1
+
+    def calculateLen(self):
+        """
+        Calculate the length of the hand.
+
+        Returns: an integer equal to the total number of letters in the hand.
+        """
+        return sum(self.hand.values())
+
+    def __str__(self):
+        """
+        Display a string representation of the hand.
+
+        Returns: a string representation of the hand.
+        """
+        output = ''
+        for letter in sorted(self.hand.keys()):
+            output += letter * self.hand[letter]
+        return output
+
+    def update(self, word):
+        """
+        Updates the hand: uses up the letters in the given word
+        and returns True if the hand has all the letters to make the word,
+        False otherwise.
+
+        word: string
+        Returns: Boolean
+        """
+        handCopy = self.hand.copy()
+        for letter in word:
+            if handCopy.get(letter, 0) > 0:
+                handCopy[letter] -= 1
+            else:
+                return False
+        self.hand = handCopy
+        return True
